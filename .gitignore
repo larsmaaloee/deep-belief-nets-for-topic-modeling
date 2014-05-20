@@ -1,0 +1,7 @@
+
+*.sh
+
+.hg/
+.hgignore
+.project
+.pydevproject

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DBN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+
+    <!-- Custom styles for this template -->
+    <link href="static/jumbotron.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+
+  
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">DBN</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Train Model</a></li>
+            <li><a href="./datapreparation.html">Data Preparation</a></li>
+            <li><a href="#testmodel">Test Model</a></li>
+            
+            </li>
+          </ul>
+          
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Deep Belief Nets for Topic Modeling</h1>
+        <p>Run full model.</p>
+        {% if running %}
+        <table style = "width: 400px" class = "table">
+              <tr>
+                <td>
+                  <input style="width: 80px" type="text" readonly = "readonly" class="form-control" placeholder={{param1}} name="param1">
+                </td>
+                <td>
+                  <input style="width: 130px" type="text" readonly = "readonly" class="form-control" placeholder={{param2}} name="param2">
+                </td>
+                <td>
+                  <input style="width: 80px" type="text" readonly = "readonly" class="form-control" placeholder={{param3}} name="param3">
+                </td>
+                <td>
+                  <input style="width: 80px" type="text" readonly = "readonly" class="form-control" placeholder={{param4}} name="param4">
+                </td>
+                <td>
+                    <button id="stop" style = "height:30px" type="button" class="btn btn-primary">Stop &raquo;</button>
+                </td>
+              </tr>
+            </table>
+          
+        {% else %}
+        <form role="form">
+          <div class="form-group" method="POST">
+            <table style = "width: 400px" class = "table">
+              <tr>
+                <td>
+                  <input style="width: 80px" type="text" class="form-control" placeholder="-V 2000" name="param1">
+                </td>
+                <td>
+                  <input style="width: 130px" type="text" class="form-control" placeholder="-H 500,250,125" name="param2">
+                </td>
+                <td>
+                  <input style="width: 80px" type="text" class="form-control" placeholder="-O 10" name="param3">
+                </td>
+                <td>
+                  <input style="width: 80px" type="text" class="form-control" placeholder="-E 50" name="param4">
+                </td>
+                <td>
+                    <button style = "height:30px" type="submit" class="btn btn-primary">Run &raquo;</button>
+                  
+                </td>
+                
+              </tr>
+            </table>
+          
+          </div>
+        </form>
+        {% endif %}
+        <!--<p><a class="btn btn-primary btn-lg" href="my-link">Run &raquo;</a></p>-->
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="info">
+        {% if error %}
+          <p>{{error}}</p>
+        {% endif %}
+      </div>
+      <div id = "prog" class="progress">
+        <div class="progress-bar" id = "progbar" style="width: 0%;">
+          <span class="sr-only">60% Complete</span>
+        </div>
+      </div>
+      <textarea id = "output" class="form-control" rows="3" readonly = "readonly"></textarea>
+
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-lg-4">
+          <h2>Pre-training</h2>
+          {% if running %}
+          <div id = "rbmimg">
+            <img src = "static/img/processing.gif" height=200 width = 200 >
+          </div>
+          {% else %}
+          <p>The pre-training is where the independent RBM's are trained. When the pre-training is done training, the result is posted in images. </p>
+
+          {% endif %}
+        </div>
+        <div class="col-lg-4">
+          <h2>Finetuning</h2>
+          {% if running %}
+          <div id = "dbnimg">
+            <img src = "static/img/processing.gif" height=200 width = 200 >
+          </div>
+          {% else %}
+          <p>The finetuning is where the full auto-encoder is trained. When the finetuning is done training
+            the result, of the finetuning is posted.</p>
+
+          {% endif %}
+       </div>
+        <div class="col-lg-4">
+          <h2>Results</h2>
+          {% if running %}
+          <div id = "resultimg">
+            <img src = "static/img/processing.gif" height=200 width = 200 >
+          </div>
+          {% else %}
+          <p>After the full training of the model, the results will be posted.</p>
+
+          {% endif %}
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Master Thesis 2013</p>
+      </footer>
+    </div> <!-- /container -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="//code.jquery.com/jquery.js"></script>
+
+    <script language="javascript" type="text/javascript">
+        $(document).ready(function() {
+            
+            {% if running %}
+            window.setInterval(function(){
+                updateProgress()
+                updateOutput()
+                updateRBMIMG()
+              }, 1000);
+            window.setInterval(function(){
+                updateRBMIMG()
+                updateDBNIMG()
+              }, 5000);
+            {% endif %}
+        });
+
+      // Update the progress
+      function updateRBMIMGSuccess () {
+        var res = this.responseText
+        if ($.trim(res) !== ''){
+
+          $('#rbmimg').html("<img src="+res+" height =250 width=300/>");  
+        }
+        
+      }
+
+      function updateRBMIMG() {
+          var xml = new XMLHttpRequest();
+          xml.open("GET", "/server/update_rbm_img", true);
+          xml.send(null);
+          xml.onload = updateRBMIMGSuccess;
+      }
+
+      function updateDBNIMGSuccess () {
+        var res = this.responseText
+        if ($.trim(res) !== ''){
+          $('#dbnimg').html("<img src="+res+" height =250 width=300/>");  
+        }
+        
+      }
+
+      function updateDBNIMG() {
+          var xml = new XMLHttpRequest();
+          xml.open("GET", "/server/update_dbn_img", true);
+          xml.send(null);
+          xml.onload = updateDBNIMGSuccess;
+      }
+
+
+      // Update the progress
+      function updateProgressSuccess () {
+        document.getElementById('progbar').style.width= this.responseText;
+      }
+
+      function updateProgress() {
+          var xml = new XMLHttpRequest();
+          xml.open("GET", "/server/get_progress", true);
+          xml.send(null);
+          xml.onload = updateProgressSuccess;
+      }
+
+      function updateOutputSuccess () {
+        document.getElementById("output").innerHTML=this.responseText;
+        var psconsole = $('#output');
+        psconsole.scrollTop(
+            psconsole[0].scrollHeight - psconsole.height()
+        );
+      }
+
+      function updateOutput() {
+          var xml = new XMLHttpRequest();
+          xml.open("GET", "/server/get_output", true);
+          xml.send(null);
+          xml.onload = updateOutputSuccess;
+      }
+
+      // Stop thread
+      $( "#stop" ).click(function() {
+        stopThread()
+      });
+
+      function stopThreadSuccess () {
+          document.getElementById("info").innerHTML=this.responseText;
+          location.reload()
+        }
+
+      function stopThread() {
+          var xml = new XMLHttpRequest();
+          xml.open("GET", "/server/stop_thread", true);
+          xml.send(null);
+          xml.onload = stopThreadSuccess;
+      }
+
+
+
+
+
+    </script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="static/js/bootstrap.min.js"></script>
+  </body>
+</html>
