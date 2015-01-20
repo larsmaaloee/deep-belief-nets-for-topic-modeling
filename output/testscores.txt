@@ -1,0 +1,84 @@
+Evaluation: 1
+Correct: 63.3% of 1000
+Correct: 65.6% of 2000
+Correct: 66.2% of 3000
+Correct: 66.4% of 4000
+Correct: 66.6% of 5000
+Correct: 67.0% of 6000
+Correct: 67.2% of 7000
+Correct: 67.3% of 8000
+Correct: 67.2% of 9000
+Correct: 67.5% of 10000
+Correct: 67.7% of 11000
+Correct: 67.7% of 12000
+Correct: 67.8% of 13000
+Correct: 67.9% of 14000
+Correct: 68.1% of 15000
+Correct: 68.2% of 16000
+Correct: 68.4% of 17000
+Correct: 68.2% of 18000
+Correct: 68.3% of 19000
+Evaluation: 3
+Correct: 62.5% of 1000
+Correct: 64.5% of 2000
+Correct: 65.2% of 3000
+Correct: 65.7% of 4000
+Correct: 66.0% of 5000
+Correct: 66.4% of 6000
+Correct: 66.6% of 7000
+Correct: 66.7% of 8000
+Correct: 66.6% of 9000
+Correct: 66.9% of 10000
+Correct: 66.9% of 11000
+Correct: 66.9% of 12000
+Correct: 66.9% of 13000
+Correct: 67.0% of 14000
+Correct: 67.1% of 15000
+Correct: 67.1% of 16000
+Correct: 67.2% of 17000
+Correct: 67.1% of 18000
+Correct: 67.1% of 19000
+Evaluation: 7
+Correct: 60.2% of 1000
+Correct: 62.6% of 2000
+Correct: 63.4% of 3000
+Correct: 63.9% of 4000
+Correct: 64.1% of 5000
+Correct: 64.4% of 6000
+Correct: 64.6% of 7000
+Correct: 64.8% of 8000
+Correct: 64.7% of 9000
+Correct: 64.8% of 10000
+Correct: 64.9% of 11000
+Correct: 64.9% of 12000
+Correct: 64.9% of 13000
+Correct: 65.0% of 14000
+Correct: 65.1% of 15000
+Correct: 65.1% of 16000
+Correct: 65.2% of 17000
+Correct: 65.1% of 18000
+Correct: 65.1% of 19000
+Evaluation: 15
+Correct: 58.2% of 1000
+Correct: 60.5% of 2000
+Correct: 61.2% of 3000
+Correct: 61.8% of 4000
+Correct: 62.0% of 5000
+Correct: 62.3% of 6000
+Correct: 62.4% of 7000
+Correct: 62.6% of 8000
+Correct: 62.4% of 9000
+Correct: 62.5% of 10000
+Correct: 62.6% of 11000
+Correct: 62.7% of 12000
+Correct: 62.6% of 13000
+Correct: 62.7% of 14000
+Correct: 62.8% of 15000
+Correct: 62.9% of 16000
+Correct: 63.0% of 17000
+Correct: 62.9% of 18000
+Correct: 62.8% of 19000
+Eval[1]: 68.3331666417%
+Eval[3]: 67.0878111876%
+Eval[7]: 65.1139515489%
+Eval[15]: 62.8366049673%
