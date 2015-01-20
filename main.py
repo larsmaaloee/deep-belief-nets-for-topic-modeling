@@ -158,7 +158,8 @@ def example3():
     '''
     In the output folder ./output you'll find "20news-19997.tar.gz" from http://qwone.com/~jason/20Newsgroups/
     processed so that you can run evaluation on the data directly. The data has been trained through a network
-    of 2000-500-250-125-10 (real valued output).
+    of 2000-500-250-125-10 (real valued output). Unzip the compressed chunks by running the output/_unzip.sh shell
+    script.
     '''
     ### EVALUATION ###
 

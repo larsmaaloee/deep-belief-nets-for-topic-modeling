@@ -32,7 +32,7 @@ The execution order is as follows:
 
 Example 3
 ---------
-In the "./output" dir is a compressed file "_20news-19997.zip". These are the output files after running the DBN (shape: 2000-500-250-125-10 real output units) on the [20news-19997.tar.gz](http://qwone.com/~jason/20Newsgroups/20news-19997.tar.gz) from http://qwone.com/~jason/20Newsgroups/ for 50 epochs pretraining and finetuning.
+In the "./output" dir is a compressed file "_20news-19997.zip". These are the output files after running the DBN (shape: 2000-500-250-125-10 real output units) on the [20news-19997.tar.gz](http://qwone.com/~jason/20Newsgroups/20news-19997.tar.gz) from http://qwone.com/~jason/20Newsgroups/ for 50 epochs pretraining and finetuning. Unzip the compressed chunks by running the shell script "output/_unzip.sh".
 
 The execution order is as follows:
 - Evaluate the accuracy of the trained network by performing forward pass of the test set and comparing the nearest neighbors in the output space.
