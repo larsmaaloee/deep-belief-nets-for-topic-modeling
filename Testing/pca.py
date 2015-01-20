@@ -4,6 +4,7 @@ __author__ = 'larsmaaloee'
 
 from pylab import *
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.cm as cm
 import matplotlib
 from matplotlib import animation
@@ -130,7 +131,7 @@ def pca_3d(X,component1,component2,component3,class_indices,path,name,data_legen
         markers += markers
 
     # Plot PCA of the data
-    f = plt.figure(figsize(15,15))
+    f = plt.figure(figsize = (15,15))
     ax = f.add_subplot(111, projection='3d',axisbg='white')
     ax._axis3don = False
 

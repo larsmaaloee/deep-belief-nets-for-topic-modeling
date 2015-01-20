@@ -1,11 +1,14 @@
-
+*.p
+*.txt
 *.sh
+*.pyc
 .hg/
 .hgignore
 .project
 .pydevproject
 # Web project is ignored thus it is not finally implemented yet.
 static/
+Misc/
 templates/
 server.py
 Setup Python Bundle.txt

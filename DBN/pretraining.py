@@ -14,7 +14,7 @@ class PreTraining:
     training.
     """
 
-    def __init__(self,visible_units,hidden_units,batches,layer_index,fout,fprogress):
+    def __init__(self,visible_units,hidden_units,batches,layer_index,fout):
         """
         Initialize the values for the RBM.
         
@@ -23,7 +23,8 @@ class PreTraining:
         @param visible_units: Number of visible units.
         @param hidden_units: Number of hidden units.
         @param batches: A list of batch sizes.
-        @param is_first_layer: Boolean if we are in first layer of the DBN.
+        @param layer_index: the index of the layer from bottom.
+        @param fout: printing output function.
         """
 
         # Set the bag of words data.
@@ -33,7 +34,6 @@ class PreTraining:
 
         # Progress and info monitoring
         self.fout = fout
-        self.fprogress = fprogress
         self.error = []
         
         # Set the number of units in each layer: visible and hidden.
@@ -88,7 +88,7 @@ class PreTraining:
                 # Negative phase - generate data from hidden to visible units and then again to hidden units.
                 neg_vis = pos_vis
                 neg_hid_prob = pos_hid
-                for i in range(100): # There is only 1 step of contrastive divergence
+                for i in range(1): # There is only 1 step of contrastive divergence
                     neg_vis,neg_hid_prob,D,p = self.__contrastive_divergence_rsm__(neg_vis, pos_hid_prob, D)
                     if i == 0:
                         perplexity+=p
@@ -114,7 +114,6 @@ class PreTraining:
                 err_str = "Epoch[%2d]: Perplexity = %.02f"%(epoch,perplexity)
                 self.fout(err_str)
                 self.error += [perplexity]
-            self.fprogress()
 
 
     def __contrastive_divergence_rsm__(self,vis,hid,D):
@@ -184,7 +183,6 @@ class PreTraining:
             err_str = "Epoch[%2d]: Error = %.07f"%(epoch+1,e)
             self.fout(err_str)
             self.error += [e]
-            self.fprogress()
 
     def __contrastive_divergence_rbm__(self,vis,hid,linear):
         neg_vis = dbn.sigmoid(dot(hid,self.weights.T) + tile(self.visible_biases,(len(vis),1)))
@@ -216,15 +214,3 @@ class PreTraining:
         """
         
         s.dump(outputs.tolist() , open(env_paths.get_rbm_output_path(str(self.num_hid),batch_index,self.layer_index), "wb" ) )
-        
-    def __plot_development__(self,pos_vis,neg_vis,epoch):
-        fig = plt.figure()
-        fig.hold()
-        plt.plot([i for i in range(500)],pos_vis)
-        plt.savefig(env_paths.get_rbm_plotting_input(epoch,self.num_vis))
-        fig = plt.figure()
-        fig.hold()
-        plt.plot([i for i in range(500)],pos_vis)
-        plt.plot([i for i in range(500)],neg_vis)
-        plt.savefig(env_paths.get_rbm_plotting_output(epoch,self.num_vis))
-        plt.close()

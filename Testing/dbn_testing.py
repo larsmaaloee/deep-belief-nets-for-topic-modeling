@@ -17,7 +17,7 @@ import pylab as plot
 import time
 
 class DBNTesting:
-    def __init__(self,testing = True,image_data = False,binary_output = False):
+    def __init__(self,testing = True,binary_output = False):
         """
         @param testing: Should be True if test data is to be plottet. Otherwise False.
         @param image_data: If the testing should be done on image data.
@@ -30,15 +30,14 @@ class DBNTesting:
         self.status = -1
         self.output = []
         self.testing = testing
-        self.image_data = image_data
         self.binary_output = binary_output
 
         try:
             self.output_data = s.load(open('output/output_data.p','rb'))
             self.class_indices = s.load(open('output/class_indices.p','rb'))
         except:
-            self.output_data = generate_output_for_test_data(image_data=self.image_data,binary_output=self.binary_output) if testing else generate_output_for_train_data(
-                image_data=self.image_data,binary_output=self.binary_output)
+            self.output_data = generate_output_for_test_data(binary_output=self.binary_output) if testing else generate_output_for_train_data(
+                binary_output=self.binary_output)
             self.class_indices = get_all_class_indices(training = False) if testing else get_all_class_indices()
             s.dump([out.tolist() for out in self.output_data],open('output/output_data.p','wb'))
             s.dump(self.class_indices,open('output/class_indices.p','wb'))
@@ -60,7 +59,6 @@ class DBNTesting:
         for e in evaluation_points:
             self.__output('Evaluation: '+str(e))
             acc = 0.0
-            now = time.time()
             for it in range(len(self.output_data)):
                 o1 = self.output_data[it]
                 if self.binary_output:
@@ -85,8 +83,6 @@ class DBNTesting:
                 acc_temp /= len(indices)
                 acc += acc_temp
                 if it+1 % 1000 == 0:
-                    print 'Time: ',time.time()-now
-                    now = time.time()
                     self.__output('Correct: '+str((acc/(it+1))*100)[:4]+"%"+' of '+str(it+1))
             accuracies.append(acc/len(self.output_data))
         for i in range(len(accuracies)):
@@ -149,7 +145,6 @@ class DBNTesting:
             acc = 0.0
             processed = 0
             for i in xrange(len(self.split_output_data)):
-                now = time.time()
                 o = self.split_output_data[i]
                 # init multiprocessing
                 manager = multiprocessing.Manager()
@@ -159,7 +154,6 @@ class DBNTesting:
                                                    self.class_indices,self.binary_output) for i in range(len(o))])
                 p.close()
                 p.join()
-                print 'time: ',time.time() - now
 
                 for _ in range(len(o)):
                     acc += result_queue.get()

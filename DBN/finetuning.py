@@ -12,14 +12,13 @@ import os
 
 class FineTuning:
 
-    def __init__(self,weight_matrices,batches,fout,fprogress,hidden_biases = None,visible_biases = None,binary_output = False):
+    def __init__(self,weight_matrices,batches,fout,hidden_biases = None,visible_biases = None,binary_output = False):
         """
         Initialize variables of the finetuning.
 
         @param weight_matrices: The list of weight matrices for the DBN.
         @param batches: The list of batch-sizes.
         @param fout: The output function. For progress monitoring of the training.
-        @param fprogress: The incrementer. For progress monitoring of the training.
         @param hidden_biases: The hidden biases for the finetuning.
         @param visible_biases: The visible biases for the finetuning.
         @param binary_output: If the output of the DBN must be binary. If so, Gaussian noise will be added to bottleneck.
@@ -27,7 +26,6 @@ class FineTuning:
 
         # Progress and info monitoring
         self.fout = fout
-        self.fprogress = fprogress
         self.binary_output = binary_output
         # Generate sampled noise matrices
         self.sampled_noise = []
@@ -81,7 +79,6 @@ class FineTuning:
             # Start backprop process
             proc = Process(target = self.backpropagation, args = (epoch,self.weight_matrices_added_biases,w_queue,))
             proc.start()
-            #self.backpropagation(epoch,self.weight_matrices_added_biases,w_queue)
             # Start error eval processes
             evaluations = []
             evaluations.append((self.weight_matrices_added_biases,epoch,True,data_processing.get_batch_list(training=True),result_queue,self.binary_output))
@@ -107,7 +104,6 @@ class FineTuning:
 
             # Save DBN
             dbn.save_dbn(self.weight_matrices_added_biases,self.train_error,self.test_error,self.fout())
-            self.fprogress()
 
     def generate_sampled_noise(self,weight_matrices_added_biases):
         for largebatch in self.large_batches_lst:
@@ -166,7 +162,6 @@ class FineTuning:
             collected_weights = array(collected_weights)
             weight_sizes.append(weight_sizes[0])
             weight_sizes = array(weight_sizes)
-
             weights, _, _ = minimize(collected_weights, self.get_grad_and_error, (weight_sizes,x),maxnumlinesearch=3,verbose = True)
             weight_matrices_added_biases = self.__convert__(weights, weight_sizes)
             batch_count += 1
@@ -219,7 +214,6 @@ class FineTuning:
         gradients_formatted = []
         for g in gradients:
             gradients_formatted = append(gradients_formatted,reshape(g,(1,len(g)*len(g[0])))[0])
-          
         return f,array(gradients_formatted)
 
 
@@ -255,7 +249,7 @@ def generate_output_data(x, weight_matrices_added_biases,binary_output = False,s
             z = dbn.sigmoid(dot(x[:,:-1],weight_matrices_added_biases[i][:-1,:])+outer(NN, weight_matrices_added_biases[i][-1,:]))
         elif i == (len(weight_matrices_added_biases)/2)-1:
             act = dot(z_values[i-1],weight_matrices_added_biases[i])
-            if binary_output:
+            if binary_output and not sampled_noise is None:
                 z = act + sampled_noise
             else:
                 z = act

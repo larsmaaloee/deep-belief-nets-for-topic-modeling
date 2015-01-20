@@ -4,8 +4,6 @@ from time import time
 from multiprocessing import Process, Pool
 from numpy import *
 import matplotlib.pyplot as plt
-from images2gif import writeGif
-from PIL import Image
 from DBN.pretraining import PreTraining
 import serialization as s
 from DBN.finetuning import FineTuning
@@ -19,7 +17,7 @@ class DBN:
     will train the Deep Autoencoder - finetuning.
     """
 
-    def __init__(self,visible_units,batches,hidden_layers,output_units,max_epochs,plot = False,binary_output = False):
+    def __init__(self,visible_units,batches,hidden_layers,output_units,max_epochs,binary_output = False):
         """
         Initialize variables of the DBN.
 
@@ -40,25 +38,7 @@ class DBN:
         self.hidden_biases = []
         self.visible_biases = []
         self.binary_output = binary_output
-        
-        # Progress parameters. Used for progress bar in web framework.
         self.output_txt = []
-        self.progress_goal = float((2+len(hidden_layers)-1)*max_epochs+max_epochs)
-        self.progress = 0.
-        
-        self.plot_dic = {}
-        if plot:
-            self.plot = True
-        else:
-            self.plot = False
-            
-    
-    def run_dbn(self):
-        """
-        Run the pretraining and the finetuning of the DBN.
-        """
-        self.run_pretraining()
-        self.run_finetuning()
         
     
     def run_pretraining(self):
@@ -77,9 +57,8 @@ class DBN:
         timer = time()
         # Bottom layer
         self.print_output('Visible units: '+str(self.visible_units)+' Hidden units: '+str(self.hidden_layers[0]))
-        r = PreTraining(self.visible_units,self.hidden_layers[0],self.batches,rbm_index,self.print_output,self.increment_progress)
+        r = PreTraining(self.visible_units,self.hidden_layers[0],self.batches,rbm_index,self.print_output)
         r.rsm_learn(self.max_epochs)
-        self.plot_dic[self.visible_units] = r.error
         self.weight_matrices.append(r.weights)
         self.hidden_biases.append(r.hidden_biases)
         self.visible_biases.append(r.visible_biases)
@@ -87,18 +66,16 @@ class DBN:
         # Middle layers
         for i in range(len(self.hidden_layers)-1):
             self.print_output('Top units: '+str(self.hidden_layers[i])+' Bottom units: '+str(self.hidden_layers[i+1]))
-            r = PreTraining(self.hidden_layers[i],self.hidden_layers[i+1],self.batches,rbm_index,self.print_output,self.increment_progress)
+            r = PreTraining(self.hidden_layers[i],self.hidden_layers[i+1],self.batches,rbm_index,self.print_output)
             r.rbm_learn(self.max_epochs)
-            self.plot_dic[self.hidden_layers[i]] = r.error
             self.weight_matrices.append(r.weights)
             self.hidden_biases.append(r.hidden_biases)
             self.visible_biases.append(r.visible_biases)
             rbm_index += 1
         # Top layer
         self.print_output('Top units: '+str(self.hidden_layers[len(self.hidden_layers)-1])+' Output units: '+str(self.output_units))
-        r = PreTraining(self.hidden_layers[len(self.hidden_layers)-1],self.output_units,self.batches,rbm_index,self.print_output,self.increment_progress)
+        r = PreTraining(self.hidden_layers[len(self.hidden_layers)-1],self.output_units,self.batches,rbm_index,self.print_output)
         r.rbm_learn(self.max_epochs,linear = True)
-        self.plot_dic[self.hidden_layers[-1]] = r.error
         self.weight_matrices.append(r.weights)
         self.hidden_biases.append(r.hidden_biases)
         self.visible_biases.append(r.visible_biases)
@@ -106,9 +83,6 @@ class DBN:
         # Save the biases and the weights.
         save_rbm_weights(self.weight_matrices,self.hidden_biases,self.visible_biases)
         self.save_output(finetuning=False)
-        # Plot
-        if self.plot:
-            self.generate_gif_rbm()
 
     def run_finetuning(self, load_from_serialization = False):
         """
@@ -126,14 +100,12 @@ class DBN:
         self.print_output('Fine Tuning')
         timer = time()
 
-        fine_tuning = FineTuning(self.weight_matrices, self.batches,self.print_output,self.increment_progress,
+        fine_tuning = FineTuning(self.weight_matrices, self.batches,self.print_output,
                                  self.hidden_biases,self.visible_biases,binary_output = self.binary_output)
         fine_tuning.run_finetuning(self.max_epochs)
         
         fine_tuning_error_train = fine_tuning.train_error
         fine_tuning_error_test = fine_tuning.test_error
-        if self.plot:
-            self.plot_finetuning_error(fine_tuning_error_train, fine_tuning_error_test)
 
         self.print_output('Time '+str(time()-timer))
         save_dbn(fine_tuning.weight_matrices_added_biases,fine_tuning_error_train,fine_tuning_error_test)
@@ -152,7 +124,7 @@ class DBN:
         self.load_finetuning_output_txt()
         self.print_output('Fine Tuning (continued)')
         timer = time()
-        fine_tuning = FineTuning(self.weight_matrices, self.batches,self.print_output,self.increment_progress,binary_output = binary_output)
+        fine_tuning = FineTuning(self.weight_matrices, self.batches,self.print_output,binary_output = binary_output)
         
         fine_tuning.run_finetuning(epochs)
         
@@ -202,46 +174,8 @@ class DBN:
             self.output_txt.append(txt)
         return self.output_txt
 
-    def increment_progress(self):
-        self.progress += 1.
-        
-    def get_progress(self):
-        return (self.progress/self.progress_goal)*100.
-    
     def get_output(self):
         return self.output_txt
-    
-    def plot_finetuning_error(self,train_error,test_error):
-        path = env_paths.get_web_server_img_path()
-        f = plt.figure()
-        f.hold()
-        plt.plot(train_error.values())
-        plt.plot(test_error.values())
-        plt.savefig(path+"/dbn.png")
-        
-    def generate_gif_rbm(self):
-        path = env_paths.get_web_server_img_path()
-        self.plot_rbm(path)
-        
-        paths = os.listdir(path)
-        file_names = []
-        for p in paths:
-            if 'rbm' in p:
-                file_names.append(path+p)
-        
-        images = [Image.open(fn) for fn in file_names]            
-        filename = path+"/rbm.GIF"
-        writeGif(filename, images, duration=5.0)
-
-    def plot_rbm(self,path):
-        count = 0
-        for layer in sorted(self.plot_dic): 
-            f = plt.figure()
-            f.hold()
-            plt.title('Layer '+str(layer))
-            plt.plot(self.plot_dic[layer])
-            plt.savefig(path+"/rbm_"+str(count)+".png")
-            count += 1
 
 
 def save_rbm_weights(weight_matrices,hidden_biases,visible_biases):

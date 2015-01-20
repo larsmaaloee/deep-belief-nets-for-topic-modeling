@@ -91,7 +91,7 @@ class Visualise:
                 class_indices_to_visualise.append(i)
 
         if not len(class_indices_to_visualise) == len(classes_to_visualise):
-            print 'Not all class names were correct.'
+            print 'Not all classes to visualise were correct.'
             return
 
         tmp_output_data = []
