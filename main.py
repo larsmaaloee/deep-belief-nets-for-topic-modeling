@@ -190,8 +190,8 @@ def run_examples():
         (save all data to ./input/20_newsgroups)
     Example3: Runs out of the box on the output data given in ./output folder.
     '''
-    example1()
-    example2()
+    #example1()
+    #example2()
     example3()
 
 
