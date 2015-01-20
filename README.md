@@ -13,40 +13,40 @@ Example 1
 In order to run this example you will need to download the 20 Newsgroup dataset [20news-bydate.tar.gz](http://qwone.com/~jason/20Newsgroups/20news-bydate.tar.gz) from http://qwone.com/~jason/20Newsgroups/ and place the unpacked dir "20-news-bydate" in the "./input" dir.
 
 The execution order is as follows:
-1. Stem the documents in the training and test set.
-2. Initialise the data processing module and generate the BOWs for the training and test set.
-3. Initialise the DBN (shape: 2000-500-500-128 binary output units) and pretrain followed by finetuning for 50 epochs each.
-4. Evaluate the accuracy of the trained network by performing forward pass of the test set and comparing the nearest neighbors in the output space.
-5. Visualise the test set on 6 categories using PCA.
+- Stem the documents in the training and test set.
+- Initialise the data processing module and generate the BOWs for the training and test set.
+- Initialise the DBN (shape: 2000-500-500-128 binary output units) and pretrain followed by finetuning for 50 epochs each.
+- Evaluate the accuracy of the trained network by performing forward pass of the test set and comparing the nearest neighbors in the output space.
+- Visualise the test set on 6 categories using PCA.
 
 Example 2
 ---------
 In order to run this example you will need to download the 20 Newsgroup dataset [20news-18828.tar.gz](http://qwone.com/~jason/20Newsgroups/20news-18828.tar.gz) from http://qwone.com/~jason/20Newsgroups/ and place the unpacked dir "20news-18828" in the "./input" dir.
 
 The execution order is as follows:
-1. Stem the documents in the data set.
-2. Initialise the data processing module and generate the BOWs for the training (70% of the docs) and test set (30% of the docs).
-3. Initialise the DBN (shape: 2000-500-250-125-10 real output units) and pretrain followed by finetuning for 50 epochs each.
-4. Evaluate the accuracy of the trained network by performing forward pass of the test set and comparing the nearest neighbors in the output space.
-5. Visualise the test set on 6 categories using PCA.
+- Stem the documents in the data set.
+- Initialise the data processing module and generate the BOWs for the training (70% of the docs) and test set (30% of the docs).
+- Initialise the DBN (shape: 2000-500-250-125-10 real output units) and pretrain followed by finetuning for 50 epochs each.
+- Evaluate the accuracy of the trained network by performing forward pass of the test set and comparing the nearest neighbors in the output space.
+- Visualise the test set on 6 categories using PCA.
 
 Example 3
 ---------
 In the "./output" dir is a compressed file "_20news-19997.zip". These are the output files after running the DBN (shape: 2000-500-250-125-10 real output units) on the [20news-19997.tar.gz](http://qwone.com/~jason/20Newsgroups/20news-19997.tar.gz) from http://qwone.com/~jason/20Newsgroups/ for 50 epochs pretraining and finetuning.
 
 The execution order is as follows:
-1. Evaluate the accuracy of the trained network by performing forward pass of the test set and comparing the nearest neighbors in the output space.
-2. Visualise the test set on 6 categories using PCA.
+- Evaluate the accuracy of the trained network by performing forward pass of the test set and comparing the nearest neighbors in the output space.
+- Visualise the test set on 6 categories using PCA.
 
 Running the toolbox on other datasets
 -------------------------------------
 The toolbox apply to all text datasets as long as the execution order is followed (cf. Examples 1 and 2):
-1. Stem documents.
-2. Generate BOWs.
-3. Initialise the DBN.
-4. Pretrain.
-5. Finetune.
-6. Evaluate v Visualise.
+- Stem documents.
+- Generate BOWs.
+- Initialise the DBN.
+- Pretrain.
+- Finetune.
+- Evaluate v Visualise.
 
 Please note that many of the learning parameters are hardcoded into the pretraining and finetuning modules. The current setting has proven to work on various datasets.
 
@@ -63,9 +63,10 @@ Note from author
 Please do not hessitate to contact or contribute if any errors or ideas occur. Enjoy.
 
 Best regards
-Lars Maaloee
-[PHD student](http://orbit.dtu.dk/en/persons/lars-maaloee(0ba00555-e860-4036-9d7b-01ec1d76f96d).html)
-Technical University of Denmark
+
+Lars Maaloee, 
+[PHD student](http://orbit.dtu.dk/en/persons/lars-maaloee(0ba00555-e860-4036-9d7b-01ec1d76f96d).html), 
+Technical University of Denmark, 
 [LinkedIn](http://dk.linkedin.com/in/larsmaaloe)
 
 
