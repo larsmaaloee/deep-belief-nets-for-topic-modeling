@@ -22,8 +22,8 @@ def example1():
     ### DATA PREPARATION ###
 
     # Define training and test set paths.
-    train_path = 'input/20news-bydate/train'
-    test_path = 'input/20news-bydate/test'
+    train_path = 'input/20news-bydate/20news-bydate-train'
+    test_path = 'input/20news-bydate/20news-bydate-test'
 
     # Generate list of all the subfolders in the training path
     paths = os.listdir(train_path)
@@ -100,7 +100,7 @@ def example2():
     ### DATA PREPARATION ###
 
     # Define training and test set paths.
-    datapath = 'input/20_newsgroups'
+    datapath = 'input/20news-18828'
 
     # Generate list of all the subfolders in the data path
     paths = os.listdir(datapath)
@@ -191,8 +191,8 @@ def run_examples():
     Example3: Runs out of the box on the output data given in ./output folder.
     '''
     example1()
-    #example2()
-    #example3()
+    example2()
+    example3()
 
 
 if __name__ == '__main__':
