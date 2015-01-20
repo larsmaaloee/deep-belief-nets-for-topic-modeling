@@ -6,6 +6,10 @@ Created on Sep 23, 2013
 
 import os
 from os.path import join
+import time
+import datetime
+import shutil
+
 
 # Data processing
 
@@ -98,14 +102,6 @@ def get_dbn_batches_lst_path():
     return join(check_dir(join(get_dbn_data_path(),'bag_of_words')),'batches.p')
 
 
-# Web server
-def get_web_server_static_path():
-    return check_dir("static")
-
-def get_web_server_img_path():
-    return check_dir(join(get_web_server_static_path(),"img"))
-
-
 def input_path():
     return check_dir("input")
 
@@ -113,6 +109,17 @@ def output_path():
     return check_dir("output")
 
 
+def archive_outputs():
+    # Make dir for archiving
+    t = time.time()
+    arch_dir_n = "_arch_"+datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H%M%S')
+    arch_dir_fp = os.path.join(output_path(),arch_dir_n)
+
+    # Move output files to archive
+    for f in os.listdir(output_path()):
+        if f.startswith("_") or f.startswith("."): continue
+        os.makedirs(arch_dir_fp)
+        shutil.move(os.path.join(output_path(),f),arch_dir_fp)
 
 def check_dir(path):
     if not os.path.exists(path):

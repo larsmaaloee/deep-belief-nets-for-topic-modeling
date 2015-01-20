@@ -1,10 +1,12 @@
 __author__ = 'larsmaaloee'
 
 import os
+
 from Testing import dbn_testing
 from Testing import visualise
 from DataPreparation import data_processing
 from DBN import dbn
+from env_paths import archive_outputs
 
 
 def example1():
@@ -13,9 +15,13 @@ def example1():
     through a network structure 2000-500-500-128 (binary outputs).
     '''
 
+    ### Archiving output files ###
+    # Archive output files so that the new simulation for example 1 will not use the data already present.
+    archive_outputs()
+
     ### DATA PREPARATION ###
 
-    #Define training and test set paths.
+    # Define training and test set paths.
     train_path = 'input/20news-bydate/train'
     test_path = 'input/20news-bydate/test'
 
@@ -87,6 +93,10 @@ def example2():
     through a network structure 2000-500-250-125-10 (real valued outputs).
     '''
 
+    ### Archiving output files ###
+    # Archive output files so that the new simulation for example 1 will not use the data already present.
+    archive_outputs()
+
     ### DATA PREPARATION ###
 
     # Define training and test set paths.
@@ -123,7 +133,7 @@ def example2():
 
     ### EVALUATION ###
 
-    # Evaluate on the test set and output as binary output units.
+    # Evaluate on the test set and output as real output units.
     eval = dbn_testing.DBNTesting(testing=True, binary_output=False)
     # Evaluate the output space on the 1,3,7,15 nearest neighbors.
     eval.generate_accuracy_measurement_parallel([1, 3, 7, 15])
@@ -139,21 +149,50 @@ def example2():
     # Visualise the output data with 2 principal components.
     v.visualise_data_pca_2d_two_components(1, 2, input_data=False)
     # Visualise the output data in 3d with 3 principal components.
-    v.visualise_data_pca_3d(1, 2, input_data=False)
+    v.visualise_data_pca_3d(1, 2, 3, input_data=False)
     # Visualise the output in a 3D movie with 3 principal components.
     v.visualise_data_pca_3d_movie(1, 2, 3, input_data=False)
+
+
+def example3():
+    '''
+    In the output folder ./output you'll find "20news-19997.tar.gz" from http://qwone.com/~jason/20Newsgroups/
+    processed so that you can run evaluation on the data directly. The data has been trained through a network
+    of 2000-500-250-125-10 (real valued output).
+    '''
+    ### EVALUATION ###
+
+    # Evaluate on the test set and output as real output units.
+    eval = dbn_testing.DBNTesting(testing=True, binary_output=False)
+    # Evaluate the output space on the 1,3,7,15 nearest neighbors.
+    eval.generate_accuracy_measurement_parallel([1, 3, 7, 15])
+
+    ### VISUALISATION ###
+
+    # Initialise visualization. Only plot 6 categories so that the plot will not get too cluttered.
+    v = visualise.Visualise(testing=True, classes_to_visualise=["rec.sport.hockey", "comp.graphics", "sci.crypt",
+                                                                "soc.religion.christian", "talk.politics.mideast",
+                                                                "talk.politics.guns"])
+    # Visualise the output data with 4 principal components.
+    v.visualise_data_pca_2d(input_data=False, number_of_components=4)
+    # Visualise the output data with 2 principal components.
+    v.visualise_data_pca_2d_two_components(1, 2, input_data=False)
+    # Visualise the output data in 3d with 3 principal components.
+    v.visualise_data_pca_3d(1, 2, 3, input_data=False)
 
 
 def run_examples():
     '''
     In order to run example 1 and example 2, please download from http://qwone.com/~jason/20Newsgroups/:
-    "20news-bydate.tar.gz"
+    Example1: "20news-bydate.tar.gz"
         (save training data to ./input/20news-bydate-small/train and test data to ./input/20news-bydate-small/train.)
-    "20news-18828.tar.gz"
+    Example2: "20news-18828.tar.gz"
         (save all data to ./input/20_newsgroups)
+    Example3: Runs out of the box on the output data given in ./output folder.
     '''
-    #example1()
-    example2()
+    example1()
+    #example2()
+    #example3()
 
 
 if __name__ == '__main__':

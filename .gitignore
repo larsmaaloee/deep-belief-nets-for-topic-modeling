@@ -1,4 +1,6 @@
-*.p
+./input/20_newsgroups
+./input/20news-bydate
+cmd_tools.py
 *.txt
 *.sh
 *.pyc

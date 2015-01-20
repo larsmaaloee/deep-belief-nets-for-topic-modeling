@@ -1,9 +1,10 @@
 __author__ = 'larsmaaloee'
 
-from time import time
 from multiprocessing import Process, Pool
+
 from numpy import *
-import matplotlib.pyplot as plt
+
+from time import time
 from DBN.pretraining import PreTraining
 import serialization as s
 from DBN.finetuning import FineTuning
@@ -17,7 +18,7 @@ class DBN:
     will train the Deep Autoencoder - finetuning.
     """
 
-    def __init__(self,visible_units,batches,hidden_layers,output_units,max_epochs,binary_output = False):
+    def __init__(self, visible_units, batches, hidden_layers, output_units, max_epochs, binary_output=False):
         """
         Initialize variables of the DBN.
 
@@ -39,15 +40,15 @@ class DBN:
         self.visible_biases = []
         self.binary_output = binary_output
         self.output_txt = []
-        
-    
+
+
     def run_pretraining(self):
         """
         Run the pretraining of the DBN. Each RBM will be trained from bottom to top of the DBN.
         """
         # Following code is the initialisation of a dummy process in order to allow numpy and multiprocessing to run
         # properly on OSX.
-        pretraining_process = Process(target = self.__run_pretraining_as_process,args = ())
+        pretraining_process = Process(target=self.__run_pretraining_as_process, args=())
         pretraining_process.start()
         pretraining_process.join()
 
@@ -56,35 +57,40 @@ class DBN:
         self.print_output('Pre Training')
         timer = time()
         # Bottom layer
-        self.print_output('Visible units: '+str(self.visible_units)+' Hidden units: '+str(self.hidden_layers[0]))
-        r = PreTraining(self.visible_units,self.hidden_layers[0],self.batches,rbm_index,self.print_output)
+        self.print_output('Visible units: ' + str(self.visible_units) + ' Hidden units: ' + str(self.hidden_layers[0]))
+        r = PreTraining(self.visible_units, self.hidden_layers[0], self.batches, rbm_index, self.print_output)
         r.rsm_learn(self.max_epochs)
         self.weight_matrices.append(r.weights)
         self.hidden_biases.append(r.hidden_biases)
         self.visible_biases.append(r.visible_biases)
         rbm_index += 1
         # Middle layers
-        for i in range(len(self.hidden_layers)-1):
-            self.print_output('Top units: '+str(self.hidden_layers[i])+' Bottom units: '+str(self.hidden_layers[i+1]))
-            r = PreTraining(self.hidden_layers[i],self.hidden_layers[i+1],self.batches,rbm_index,self.print_output)
+        for i in range(len(self.hidden_layers) - 1):
+            self.print_output(
+                'Top units: ' + str(self.hidden_layers[i]) + ' Bottom units: ' + str(self.hidden_layers[i + 1]))
+            r = PreTraining(self.hidden_layers[i], self.hidden_layers[i + 1], self.batches, rbm_index,
+                            self.print_output)
             r.rbm_learn(self.max_epochs)
             self.weight_matrices.append(r.weights)
             self.hidden_biases.append(r.hidden_biases)
             self.visible_biases.append(r.visible_biases)
             rbm_index += 1
         # Top layer
-        self.print_output('Top units: '+str(self.hidden_layers[len(self.hidden_layers)-1])+' Output units: '+str(self.output_units))
-        r = PreTraining(self.hidden_layers[len(self.hidden_layers)-1],self.output_units,self.batches,rbm_index,self.print_output)
-        r.rbm_learn(self.max_epochs,linear = True)
+        self.print_output(
+            'Top units: ' + str(self.hidden_layers[len(self.hidden_layers) - 1]) + ' Output units: ' + str(
+                self.output_units))
+        r = PreTraining(self.hidden_layers[len(self.hidden_layers) - 1], self.output_units, self.batches, rbm_index,
+                        self.print_output)
+        r.rbm_learn(self.max_epochs, linear=True)
         self.weight_matrices.append(r.weights)
         self.hidden_biases.append(r.hidden_biases)
         self.visible_biases.append(r.visible_biases)
-        print 'Time ',time()-timer
+        print 'Time ', time() - timer
         # Save the biases and the weights.
-        save_rbm_weights(self.weight_matrices,self.hidden_biases,self.visible_biases)
+        save_rbm_weights(self.weight_matrices, self.hidden_biases, self.visible_biases)
         self.save_output(finetuning=False)
 
-    def run_finetuning(self, load_from_serialization = False):
+    def run_finetuning(self, load_from_serialization=False):
         """
         Run the finetuning of the DBN. This will only run if the pretraining has been run.
 
@@ -92,7 +98,7 @@ class DBN:
         """
         try:
             if load_from_serialization:
-                self.weight_matrices,self.hidden_biases,self.visible_biases = load_rbm_weights()
+                self.weight_matrices, self.hidden_biases, self.visible_biases = load_rbm_weights()
         except IOError:
             print 'Please run pretraining before executing finetuning.'
             return
@@ -100,19 +106,19 @@ class DBN:
         self.print_output('Fine Tuning')
         timer = time()
 
-        fine_tuning = FineTuning(self.weight_matrices, self.batches,self.print_output,
-                                 self.hidden_biases,self.visible_biases,binary_output = self.binary_output)
+        fine_tuning = FineTuning(self.weight_matrices, self.batches, self.print_output,
+                                 self.hidden_biases, self.visible_biases, binary_output=self.binary_output)
         fine_tuning.run_finetuning(self.max_epochs)
-        
+
         fine_tuning_error_train = fine_tuning.train_error
         fine_tuning_error_test = fine_tuning.test_error
 
-        self.print_output('Time '+str(time()-timer))
-        save_dbn(fine_tuning.weight_matrices_added_biases,fine_tuning_error_train,fine_tuning_error_test)
-        self.output_dbn_errors(fine_tuning_error_train,fine_tuning_error_test)
+        self.print_output('Time ' + str(time() - timer))
+        save_dbn(fine_tuning.weight_matrices_added_biases, fine_tuning_error_train, fine_tuning_error_test)
+        self.output_dbn_errors(fine_tuning_error_train, fine_tuning_error_test)
         self.save_output()
 
-    def continue_finetuning(self,epochs,binary_output = False):
+    def continue_finetuning(self, epochs, binary_output=False):
         """
         Continue finetuning. This will only run if the finetuning has already run.
 
@@ -124,51 +130,51 @@ class DBN:
         self.load_finetuning_output_txt()
         self.print_output('Fine Tuning (continued)')
         timer = time()
-        fine_tuning = FineTuning(self.weight_matrices, self.batches,self.print_output,binary_output = binary_output)
-        
+        fine_tuning = FineTuning(self.weight_matrices, self.batches, self.print_output, binary_output=binary_output)
+
         fine_tuning.run_finetuning(epochs)
-        
+
         fine_tuning_error_train = fine_tuning.train_error
         fine_tuning_error_test = fine_tuning.test_error
-        
-        self.print_output('Time '+str(time()-timer))
-        save_dbn(fine_tuning.weight_matrices_added_biases,fine_tuning_error_train,fine_tuning_error_test)
-        self.output_dbn_errors(fine_tuning_error_train,fine_tuning_error_test)
+
+        self.print_output('Time ' + str(time() - timer))
+        save_dbn(fine_tuning.weight_matrices_added_biases, fine_tuning_error_train, fine_tuning_error_test)
+        self.output_dbn_errors(fine_tuning_error_train, fine_tuning_error_test)
         self.save_output()
 
-    def output_dbn_errors(self,fine_tuning_error_train,fine_tuning_error_test):
+    def output_dbn_errors(self, fine_tuning_error_train, fine_tuning_error_test):
         """
         @param fine_tuning_error_train: Dictionary of the train error for each epoch.
         @param fine_tuning_error_test: Dictionary of the test error for each epoch.
         """
         self.print_output("Finetuning train error:")
         for k in fine_tuning_error_train:
-            self.print_output("Train error epoch["+str(k+1)+"]: "+str(fine_tuning_error_train[k]))
+            self.print_output("Train error epoch[" + str(k + 1) + "]: " + str(fine_tuning_error_train[k]))
         self.print_output("Finetuning test error:")
         for k in fine_tuning_error_test:
-            self.print_output("Test error epoch["+str(k+1)+"]: "+str(fine_tuning_error_test[k]))
+            self.print_output("Test error epoch[" + str(k + 1) + "]: " + str(fine_tuning_error_test[k]))
 
-    def save_output(self, finetuning = True):
+    def save_output(self, finetuning=True):
         """
         Save the output of the progress of the training process for the pretraining or the finetuning.
         @param finetuning: If finetuning is True, the error for finetuning should be saved and vice versa.
         """
         p = env_paths.get_dbn_output_txt_path() if finetuning else env_paths.get_rbm_output_txt_path()
-        out = open(p,"w")
+        out = open(p, "w")
         for elem in self.output_txt:
-            out.write(elem+"\n")
+            out.write(elem + "\n")
         out.close()
         self.output_txt = []
 
     def load_finetuning_output_txt(self):
-        txt = open(env_paths.get_dbn_output_txt_path(),"r")
+        txt = open(env_paths.get_dbn_output_txt_path(), "r")
         while True:
             line = txt.readline()
             if not line:
                 break
             self.output_txt.append(line)
 
-    def print_output(self,txt = None):
+    def print_output(self, txt=None):
         if not txt == None:
             print txt
             self.output_txt.append(txt)
@@ -178,31 +184,33 @@ class DBN:
         return self.output_txt
 
 
-def save_rbm_weights(weight_matrices,hidden_biases,visible_biases):
+def save_rbm_weights(weight_matrices, hidden_biases, visible_biases):
     """
     Save the weight matrices from the rbm pretraining.
 
     @param weight_matrices: the weight matrices of the rbm pretraining.
     """
-    s.dump([w.tolist() for w in weight_matrices] , open( env_paths.get_rbm_weights_path(), "wb" ) )
-    s.dump([b.tolist() for b in hidden_biases] , open( env_paths.get_rbm_hidden_biases_path(), "wb" ) )
-    s.dump([b.tolist() for b in visible_biases] , open( env_paths.get_rbm_visible_biases_path(), "wb" ) )
+    s.dump([w.tolist() for w in weight_matrices], open(env_paths.get_rbm_weights_path(), "wb"))
+    s.dump([b.tolist() for b in hidden_biases], open(env_paths.get_rbm_hidden_biases_path(), "wb"))
+    s.dump([b.tolist() for b in visible_biases], open(env_paths.get_rbm_visible_biases_path(), "wb"))
 
-def save_dbn(weight_matrices,fine_tuning_error_train,fine_tuning_error_test,output = None):
+
+def save_dbn(weight_matrices, fine_tuning_error_train, fine_tuning_error_test, output=None):
     """
     Save the deep belief network into serialized files.
 
     @param weight_matrices: the weight matrices of the deep belief network.
     """
-    s.dump([w.tolist() for w in weight_matrices] , open( env_paths.get_dbn_weight_path(), "wb" ) )
-    s.dump(fine_tuning_error_train , open( env_paths.get_dbn_training_error_path(), "wb" ) )
-    s.dump(fine_tuning_error_test , open( env_paths.get_dbn_test_error_path(), "wb" ) )
+    s.dump([w.tolist() for w in weight_matrices], open(env_paths.get_dbn_weight_path(), "wb"))
+    s.dump(fine_tuning_error_train, open(env_paths.get_dbn_training_error_path(), "wb"))
+    s.dump(fine_tuning_error_test, open(env_paths.get_dbn_test_error_path(), "wb"))
 
     if not output == None:
-        out = open(env_paths.get_dbn_output_txt_path(),"w")
+        out = open(env_paths.get_dbn_output_txt_path(), "w")
         for elem in output:
-            out.write(elem+"\n")
+            out.write(elem + "\n")
         out.close()
+
 
 def load_dbn_weights():
     """
@@ -210,7 +218,7 @@ def load_dbn_weights():
 
     @param weight_matrices: the weight matrices of the finetuning.
     """
-    return [array(w) for w in s.load(open(env_paths.get_dbn_weight_path(), "rb" ) )]
+    return [array(w) for w in s.load(open(env_paths.get_dbn_weight_path(), "rb"))]
 
 
 def load_rbm_weights():
@@ -219,20 +227,23 @@ def load_rbm_weights():
 
     @param weight_matrices: the weight matrices of the rbm pretraining.
     """
-    weights = [array(w) for w in s.load( open( env_paths.get_rbm_weights_path(), "rb" ) )]
-    hid_bias = [array(b) for b in s.load( open( env_paths.get_rbm_hidden_biases_path(), "rb" ) )]
-    vis_bias = [array(b) for b in s.load( open( env_paths.get_rbm_visible_biases_path(), "rb" ) )]
-    return weights,hid_bias,vis_bias
+    weights = [array(w) for w in s.load(open(env_paths.get_rbm_weights_path(), "rb"))]
+    hid_bias = [array(b) for b in s.load(open(env_paths.get_rbm_hidden_biases_path(), "rb"))]
+    vis_bias = [array(b) for b in s.load(open(env_paths.get_rbm_visible_biases_path(), "rb"))]
+    return weights, hid_bias, vis_bias
+
 
 def sigmoid(x):
-    return 1./(1+exp(-x))
+    return 1. / (1 + exp(-x))
+
 
 def softmax(x):
     numerator = exp(x)
-    denominator = numerator.sum(axis = 1)
-    denominator = denominator.reshape((x.shape[0],1))
-    softmax = numerator/denominator
+    denominator = numerator.sum(axis=1)
+    denominator = denominator.reshape((x.shape[0], 1))
+    softmax = numerator / denominator
     return softmax
+
 
 def get_weights():
     """
@@ -240,9 +251,10 @@ def get_weights():
 
     @return: Weights of the DBN.
     """
-    return [array(w) for w in s.load(open(env_paths.get_dbn_weight_path(), "rb" ) )]
+    return [array(w) for w in s.load(open(env_paths.get_dbn_weight_path(), "rb"))]
 
-def generate_output_for_test_data(binary_output = False):
+
+def generate_output_for_test_data(binary_output=False):
     """
     For all test data, generate the output and add to a list.
 
@@ -250,69 +262,72 @@ def generate_output_for_test_data(binary_output = False):
     """
 
     weight_matrices_added_biases = get_weights()
-    batches = data_processing.get_batch_list(training = False)
+    batches = data_processing.get_batch_list(training=False)
     output_data = []
 
     evaluations = []
     for batch in range(len(batches)):
-        evaluations.append((batches[batch],weight_matrices_added_biases,binary_output))
+        evaluations.append((batches[batch], weight_matrices_added_biases, binary_output))
     p = Pool(6)
-    results = p.map(__generate_output_for_test_data_par,evaluations)
+    results = p.map(__generate_output_for_test_data_par, evaluations)
     p.close()
     p.join()
     for elem in results:
-        output_data+=elem
+        output_data += elem
     return output_data
 
 
 def __generate_output_for_test_data_par(args):
-    batch,weight_matrices_added_biases,binary_output = args
-    d = data_processing.get_bag_of_words_matrix(batch,training = False)
-    return list((generate_output_data(d, weight_matrices_added_biases,binary_output)))
+    batch, weight_matrices_added_biases, binary_output = args
+    d = data_processing.get_bag_of_words_matrix(batch, training=False)
+    return list((generate_output_data(d, weight_matrices_added_biases, binary_output)))
 
 
-def generate_output_for_train_data(binary_output = False):
+def generate_output_for_train_data(binary_output=False):
     """
     For all train data, generate the output and add to a list.
 
     @return: List of all output data.
     """
     weight_matrices_added_biases = get_weights()
-    batches = data_processing.get_batch_list(training = True)
+    batches = data_processing.get_batch_list(training=True)
     output_data = []
-    
+
     evaluations = []
     for batch in range(len(batches)):
-        evaluations.append((batches[batch],weight_matrices_added_biases,binary_output))
+        evaluations.append((batches[batch], weight_matrices_added_biases, binary_output))
     p = Pool(6)
-    results = p.map(__generate_output_for_train_data_par,evaluations)
+    results = p.map(__generate_output_for_train_data_par, evaluations)
     p.close()
     p.join()
     for elem in results:
-        output_data+=elem
+        output_data += elem
     return output_data
 
-def __generate_output_for_train_data_par(args):
-    batch,weight_matrices_added_biases,binary_output = args
-    d = data_processing.get_bag_of_words_matrix(batch,training = True)
-    return list((generate_output_data(d, weight_matrices_added_biases,binary_output=binary_output)))
 
-def generate_input_data_list(training = True):
+def __generate_output_for_train_data_par(args):
+    batch, weight_matrices_added_biases, binary_output = args
+    d = data_processing.get_bag_of_words_matrix(batch, training=True)
+    return list((generate_output_data(d, weight_matrices_added_biases, binary_output=binary_output)))
+
+
+def generate_input_data_list(training=True):
     """
     Generate a list of all input data.
 
     @param training: If training is True, the input should be generated for training data and vice versa.
     """
-    batches = data_processing.get_batch_list(training = training)
+    batches = data_processing.get_batch_list(training=training)
     input_data = []
 
     for batch in range(len(batches)):
-        print 'Batch ',batch + 1, ' of ',len(batches)
-        d = data_processing.get_bag_of_words_matrix(batches[batch],training=training)
+        print 'Batch ', batch + 1, ' of ', len(batches)
+        d = data_processing.get_bag_of_words_matrix(batches[batch], training=training)
         d = get_norm_x(d)
         input_data += list(d)
 
     return input_data
+
 
 def get_norm_x(x_matrix):
     """
@@ -320,14 +335,15 @@ def get_norm_x(x_matrix):
     @param x_matrix: The BOW matrix.
     @return: The normalized BOW.
     """
-    sum_x = sum(x_matrix,axis = 1)
+    sum_x = sum(x_matrix, axis=1)
     indices = where(sum_x == 0)
     for i in indices:
         sum_x[i] = 1.
-    norm_x = x_matrix/sum_x[newaxis].T
+    norm_x = x_matrix / sum_x[newaxis].T
     return norm_x
 
-def generate_output_data(x, weight_matrices_added_biases,binary_output=False):
+
+def generate_output_data(x, weight_matrices_added_biases, binary_output=False):
     """
     Generate a forwards-pass through the DBN.
 
@@ -339,18 +355,22 @@ def generate_output_data(x, weight_matrices_added_biases,binary_output=False):
     output_batch = []
     for d in x:
         z_values = []
-        for i in range(len(weight_matrices_added_biases)/2):
+        for i in range(len(weight_matrices_added_biases) / 2):
             if i == 0:
-                z = sigmoid(dot(d,weight_matrices_added_biases[i][:-1,:])+outer(sum(d), weight_matrices_added_biases[i][-1,:]))
-            elif i == (len(weight_matrices_added_biases)/2)-1:
-                z = dot(z_values[i-1],weight_matrices_added_biases[i])
+                z = sigmoid(dot(d, weight_matrices_added_biases[i][:-1, :]) + outer(sum(d),
+                                                                                    weight_matrices_added_biases[i][-1,
+                                                                                    :]))
+            elif i == (len(weight_matrices_added_biases) / 2) - 1:
+                z = dot(z_values[i - 1], weight_matrices_added_biases[i])
             else:
-                z = sigmoid(dot(z_values[i-1],weight_matrices_added_biases[i]))
+                z = sigmoid(dot(z_values[i - 1], weight_matrices_added_biases[i]))
 
-            z = append(z,ones(1,dtype = float64))
+            z = append(z, ones(1, dtype=float64))
             z_values.append(z)
 
-        if binary_output: out = array(z[:-1]<=threshold,dtype = int)
-        else: out = z[:-1]
+        if binary_output:
+            out = array(z[:-1] <= threshold, dtype=int)
+        else:
+            out = z[:-1]
         output_batch.append(out)
     return array(output_batch)
