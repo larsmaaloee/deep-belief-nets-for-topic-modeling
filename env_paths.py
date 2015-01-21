@@ -114,11 +114,11 @@ def archive_outputs():
     t = time.time()
     arch_dir_n = "_arch_"+datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H%M%S')
     arch_dir_fp = os.path.join(output_path(),arch_dir_n)
+    os.makedirs(arch_dir_fp)
 
     # Move output files to archive
     for f in os.listdir(output_path()):
         if f.startswith("_") or f.startswith("."): continue
-        os.makedirs(arch_dir_fp)
         shutil.move(os.path.join(output_path(),f),arch_dir_fp)
 
 def check_dir(path):
