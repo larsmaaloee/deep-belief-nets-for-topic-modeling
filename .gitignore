@@ -1,6 +1,4 @@
-./input/20_newsgroups
-./input/20news-bydate
-cmd_tools.py
+*.p
 *.txt
 *.sh
 *.pyc
@@ -8,10 +6,6 @@ cmd_tools.py
 .hgignore
 .project
 .pydevproject
-# Web project is ignored thus it is not finally implemented yet.
-static/
-Misc/
-templates/
-server.py
-Setup Python Bundle.txt
-setup.py
+*.png
+*.jpg
+.idea/
