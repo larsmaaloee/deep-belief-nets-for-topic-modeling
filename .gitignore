@@ -7,6 +7,5 @@
 .project
 .pydevproject
 *.png
-*.jpg
 .idea/
 input/20news-bydate
