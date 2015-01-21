@@ -347,8 +347,15 @@ def __stem_docs(paths):
         d = os.listdir(folder)
         docs += [os.path.join(x, y) for (x, y) in zip([folder for _ in range(len(d))], d)]
 
+    tmp_docs = []
     for doc in docs:
-        if not doc.endswith(".txt"): docs.remove(doc)
+        if "." in doc.split("/")[-1]:
+            if doc.endswith(".txt"): tmp_docs.append(doc)
+        else:
+            rename = doc + ".txt"
+            os.rename(doc, rename)
+            tmp_docs.append(rename)
+    docs = tmp_docs
     p = Pool(6)
     p.map_async(__stem_doc, zip([i for i in range(len(docs))], docs))
     p.close()
