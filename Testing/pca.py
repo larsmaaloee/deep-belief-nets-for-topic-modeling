@@ -105,7 +105,7 @@ def pca_2d_for_2_components(X, component1, component2, class_indices, path, name
     # plt.xlabel('PC{0}'.format(component1))
     #plt.ylabel('PC{0}'.format(component2))
 
-    #legend = plt.legend(data_legend)
+    legend = plt.legend(data_legend)
     #legend = plt.legend(data_legend,loc=(0.0,0.0),labelspacing = 0.1)
 
     savefig(path + '/' + name + '.png', dpi=200, transparent=True)

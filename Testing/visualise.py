@@ -76,8 +76,7 @@ class Visualise:
             s.dump([out.tolist() for out in self.output_data], open('output/output_data.p', 'wb'))
             s.dump(self.class_indices, open('output/class_indices.p', 'wb'))
 
-        self.legend = ["0", "1", "2", "3", "4", "5", "6", "7", "8",
-                       "9"]  # get_class_names_for_class_indices(list(set(sorted(self.class_indices))))
+        self.legend = get_class_names_for_class_indices(list(set(sorted(self.class_indices))))
 
     def __filter_output_data(self, classes_to_visualise):
         """
