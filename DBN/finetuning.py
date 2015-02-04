@@ -1,6 +1,6 @@
 __author__ = 'larsmaaloee'
 
-from multiprocessing import Process, Pool, Manager
+from multiprocessing import Process, Pool, Manager, cpu_count
 import os
 
 from numpy import *
@@ -90,7 +90,7 @@ class FineTuning:
             evaluations.append((
                 self.weight_matrices_added_biases, epoch, False, data_processing.get_batch_list(training=False),
                 result_queue, self.binary_output))
-            p = Pool(6)
+            p = Pool(cpu_count())
             p.map_async(error, evaluations)
             p.close()
 
@@ -329,7 +329,7 @@ def generate_large_batch_parallel(args):
     for batch in batches:
         # Append input data.
         x_tmp = get_bag_of_words_matrix(batch)
-        if x == None:
+        if x is None:
             x = x_tmp
         else:
             x = append(x, x_tmp, axis=0)

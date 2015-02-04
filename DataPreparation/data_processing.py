@@ -15,9 +15,6 @@ import env_paths
 import stopwords
 
 
-global wordpunct_tokenize
-global EnglishStemmer
-
 
 class DataProcessing:
     def __init__(self, paths, words_count=2000, batchsize=100, trainingset_size=None, trainingset_attributes=None,
@@ -314,29 +311,6 @@ class DataProcessing:
 
 
 def stem_docs_parallel(paths):
-    """
-    Stem all documents from the given path names
-
-    @param paths: paths to the documents.
-    """
-
-    # Following code is the initialisation of a dummy process in order to allow numpy and multiprocessing to run
-    # properly on OSX.
-    stem_process = Process(target=__stem_docs, args=(paths,))
-    stem_process.start()
-    stem_process.join()
-
-
-def __stem_docs(paths):
-    # Import nltk tools
-    global wordpunct_tokenize
-    global EnglishStemmer
-    from nltk.tokenize import wordpunct_tokenize as wt
-    # from nltk.stem.snowball import EnglishStemmer
-    from nltk.stem.porter import PorterStemmer as ES
-    wordpunct_tokenize = wt
-    EnglishStemmer = ES
-
     print 'Stemming documents in parallel.'
     docs = []
     for folder in paths:
@@ -352,6 +326,7 @@ def __stem_docs(paths):
             os.rename(doc, rename)
             tmp_docs.append(rename)
     docs = tmp_docs
+
     p = Pool(cpu_count())
     p.map_async(__stem_doc, zip([i for i in range(len(docs))], docs))
     p.close()
@@ -359,6 +334,10 @@ def __stem_docs(paths):
 
 
 def __stem_doc(doc_details):
+    # Import nltk tools
+    from nltk.tokenize import wordpunct_tokenize as wordpunct_tokenize
+    # from nltk.stem.snowball import EnglishStemmer
+    from nltk.stem.porter import PorterStemmer as EnglishStemmer
     idx, doc = doc_details
     if idx % 100 == 0:
         print "Processed doc " + str(idx)
