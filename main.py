@@ -44,8 +44,8 @@ def example1():
     print test_paths
 
     # Stem documents and compute a .p file (serlialized file).
-    data_processing.stem_docs(train_paths)
-    data_processing.stem_docs(test_paths)
+    data_processing.stem_docs_parallel(train_paths)
+    data_processing.stem_docs_parallel(test_paths)
 
     # Generate bag of word matrix for training set.
     dat_proc_train = data_processing.DataProcessing(train_paths, words_count=2000, trainingset_size=1.0)
@@ -58,7 +58,7 @@ def example1():
     ### DBN TRAINING ###
 
     # Generate network 2000-500-500-128 (binary outputs), training 50 epochs.
-    deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 500], 128, 5, binary_output=True)
+    deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 500], 128, 50, binary_output=True)
     # Pretrain with a replicated softmax model at the bottom and restricted boltzmann machines in the remaining layers.
     deepbelief.run_pretraining()
     # Construct deep autoencoder and finetune using backpropagation with conjugate gradient as optimization.
@@ -112,7 +112,7 @@ def example2():
     print datapaths
 
     # Stem documents and compute a .p file (serlialized file).
-    data_processing.stem_docs(datapaths)
+    data_processing.stem_docs_parallel(datapaths)
 
     # Generate bag of word matrix for training set which is 0.7 (70%) of the data in the data paths.
     dat_proc_train = data_processing.DataProcessing(datapaths, words_count=2000, trainingset_size=1.0)

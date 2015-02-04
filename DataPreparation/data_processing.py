@@ -12,6 +12,7 @@ import serialization as s
 from time import time
 from itertools import chain
 import env_paths
+import stopwords
 
 
 global wordpunct_tokenize
@@ -146,13 +147,13 @@ class DataProcessing:
             d_tmp = array([int(v) for v in d.values()])
             while True:
                 if (len(batch_class_indices) == self.batchsize) and (not doc_count - count < self.batchsize) or (
-                    count == doc_count):
+                            count == doc_count):
                     break
                 if len(d_tmp[d_tmp > 0]) == 0:
                     break
                 for j in range(number_of_classes):
                     if (len(batch_class_indices) == self.batchsize) and (not doc_count - count < self.batchsize) or (
-                        count == doc_count):
+                                count == doc_count):
                         break
                     if len(class_indices_split[j]) > 0 and d_tmp[j] != 0:
                         batch_class_indices.append(class_indices_split[j].pop(0))
@@ -196,7 +197,7 @@ class DataProcessing:
         docs_list = []
         for i in xrange(len(class_indices)):
             if not count == 0 and (
-                count % self.batchsize) == 0:  # Save the batch if batchsize is reached or if the last document has been read.
+                        count % self.batchsize) == 0:  # Save the batch if batchsize is reached or if the last document has been read.
                 if not (len(class_indices) - count) < self.batchsize:
                     print 'Read ', str(count), ' of ', len(class_indices)
                     self.__save_batch_loading_docs(count, docs_list, docs_names_batch, class_indices_batch)
@@ -313,7 +314,7 @@ class DataProcessing:
             processed += 1
 
 
-def stem_docs(paths):
+def stem_docs_parallel(paths):
     """
     Stem all documents from the given path names
 
@@ -369,10 +370,10 @@ def __stem_doc(doc_details):
     if doc.endswith('.txt'):
         d = open(doc).read()
         stemmer = EnglishStemmer()  # This method only works for english documents.
+        # Stem, lowercase, substitute all punctuations, remove stopwords.
         attribute_names = [stemmer.stem(token.lower()) for token in wordpunct_tokenize(
             re.sub('[%s]' % re.escape(string.punctuation), '', d.decode(encoding='UTF-8', errors='ignore'))) if
-                           token.lower() not in stopwords.words(
-                               'english')]  # Stem, lowercase, substitute all punctuations, remove stopwords.
+                           token.lower() not in stopwords.get_stopwords()]
         s.dump(attribute_names, open(doc.replace(".txt", ".p"), "wb"))
 
 
