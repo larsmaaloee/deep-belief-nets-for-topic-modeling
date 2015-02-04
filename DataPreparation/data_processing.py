@@ -17,7 +17,6 @@ import stopwords
 
 global wordpunct_tokenize
 global EnglishStemmer
-global stopwords
 
 
 class DataProcessing:
@@ -332,15 +331,11 @@ def __stem_docs(paths):
     # Import nltk tools
     global wordpunct_tokenize
     global EnglishStemmer
-    global stopwords
     from nltk.tokenize import wordpunct_tokenize as wt
     # from nltk.stem.snowball import EnglishStemmer
     from nltk.stem.porter import PorterStemmer as ES
-    from nltk.corpus import stopwords as sw
-
     wordpunct_tokenize = wt
     EnglishStemmer = ES
-    stopwords = sw
 
     print 'Stemming documents in parallel.'
     docs = []
