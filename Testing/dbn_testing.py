@@ -151,7 +151,7 @@ class DBNTesting:
                 # init multiprocessing
                 manager = multiprocessing.Manager()
                 result_queue = manager.Queue()
-                p = Pool(6)
+                p = Pool(multiprocessing.cpu_count())
                 p.map_async(generate_acc_for_doc, [(distances_dict, e, processed + i, result_queue, self.output_data,
                                                     self.class_indices, self.binary_output) for i in range(len(o))])
                 p.close()
@@ -162,7 +162,6 @@ class DBNTesting:
                 processed += len(o)
                 if processed % 1000 == 0:
                     self.__output('Correct: ' + str((acc / (processed)) * 100)[:4] + "%" + ' of ' + str(processed))
-
             accuracies.append(acc / len(self.output_data))
 
         for i in range(len(accuracies)):
@@ -319,7 +318,7 @@ def LDA_DBN_comparison(lda_output_data, lda_doc_names, dbn_output_data, dbn_doc_
             # init multiprocessing
             manager = multiprocessing.Manager()
             result_queue = manager.Queue()
-            p = Pool(6)
+            p = Pool()
             p.map_async(generate_comparison, [(e, lda_output_data, lda_doc_names, dbn_output_data, dbn_doc_names,
                                                processed + j, result_queue, binary_output) for j in range(len(o))])
             p.close()

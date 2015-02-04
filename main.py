@@ -22,8 +22,8 @@ def example1():
     ### DATA PREPARATION ###
 
     # Define training and test set paths.
-    train_path = 'input/20news-bydate/20news-bydate-train'
-    test_path = 'input/20news-bydate/20news-bydate-test'
+    train_path = os.path.join('input','20news-bydate','20news-bydate-train')
+    test_path = os.path.join('input','20news-bydate','20news-bydate-test')
 
     # Generate list of all the subfolders in the training path
     paths = os.listdir(train_path)
@@ -58,7 +58,7 @@ def example1():
     ### DBN TRAINING ###
 
     # Generate network 2000-500-500-128 (binary outputs), training 50 epochs.
-    deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 500], 128, 50, binary_output=True)
+    deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 500], 128, 5, binary_output=True)
     # Pretrain with a replicated softmax model at the bottom and restricted boltzmann machines in the remaining layers.
     deepbelief.run_pretraining()
     # Construct deep autoencoder and finetune using backpropagation with conjugate gradient as optimization.
@@ -100,7 +100,7 @@ def example2():
     ### DATA PREPARATION ###
 
     # Define training and test set paths.
-    datapath = 'input/20news-18828'
+    datapath = os.path.join('input','20news-18828')
 
     # Generate list of all the subfolders in the data path
     paths = os.listdir(datapath)

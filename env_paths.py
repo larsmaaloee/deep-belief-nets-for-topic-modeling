@@ -43,6 +43,9 @@ def get_class_indices_path(train,batch):
 def get_bow_matrix_path(train,batch):
     return join(get_bow_path(train),"bow_batch_"+str(batch)+".p")
 
+def get_acceptance_lst_path():
+    return join(output_path(),'output/acceptance_lst_stemmed.txt')
+
 
 
 

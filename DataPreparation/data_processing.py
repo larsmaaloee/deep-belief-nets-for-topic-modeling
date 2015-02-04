@@ -4,7 +4,7 @@ import os
 import re
 import string
 from random import shuffle
-from multiprocessing import Pool, Process
+from multiprocessing import Pool, Process, cpu_count
 
 from numpy import *
 
@@ -349,14 +349,14 @@ def __stem_docs(paths):
 
     tmp_docs = []
     for doc in docs:
-        if "." in doc.split("/")[-1]:
+        if "." in doc.split(os.path.sep)[-1]:
             if doc.endswith(".txt"): tmp_docs.append(doc)
         else:
             rename = doc + ".txt"
             os.rename(doc, rename)
             tmp_docs.append(rename)
     docs = tmp_docs
-    p = Pool(6)
+    p = Pool(cpu_count())
     p.map_async(__stem_doc, zip([i for i in range(len(docs))], docs))
     p.close()
     p.join()
@@ -515,7 +515,7 @@ def stem_acceptance_list(path):
     for word in acceptance_lst:
         acceptance_lst_stemmed.append(stemmer.stem(word.lower()))
 
-    f = open('output/acceptance_lst_stemmed.txt', 'w')
+    f = open(env_paths.get_acceptance_lst_path(), 'w')
     for w in acceptance_lst_stemmed[:-1]:
         f.write(w + "\n")
     f.write(acceptance_lst_stemmed[-1])
