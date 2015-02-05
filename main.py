@@ -22,8 +22,8 @@ def example1():
     ### DATA PREPARATION ###
 
     # Define training and test set paths.
-    train_path = os.path.join('input','20news-bydate','20news-bydate-train')
-    test_path = os.path.join('input','20news-bydate','20news-bydate-test')
+    train_path = os.path.join('input', '20news-bydate', '20news-bydate-train')
+    test_path = os.path.join('input', '20news-bydate', '20news-bydate-test')
 
     # Generate list of all the subfolders in the training path
     paths = os.listdir(train_path)
@@ -58,9 +58,9 @@ def example1():
     ### DBN TRAINING ###
 
     # Generate network 2000-500-500-128 (binary outputs), training 50 epochs.
-    deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 500], 128, 50, binary_output=True)
+    deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 500], 128, 1, binary_output=True)
     # Pretrain with a replicated softmax model at the bottom and restricted boltzmann machines in the remaining layers.
-    deepbelief.run_pretraining()
+    deepbelief.run_pretraining(learning_rate=0.01, weight_cost=0.0002, momentum=0.9, gibbs_steps=1)
     # Construct deep autoencoder and finetune using backpropagation with conjugate gradient as optimization.
     deepbelief.run_finetuning(load_from_serialization=True)
 
@@ -83,8 +83,8 @@ def example1():
     v.visualise_data_pca_2d_two_components(1, 2, input_data=False)
     # Visualise the output data in 3d with 3 principal components.
     v.visualise_data_pca_3d(1, 2, 3, input_data=False)
-    # Visualise the output in a 3D movie.
-    v.visualise_data_pca_3d_movie(1, 2, 3, input_data=False)
+    # Visualise the output in a 3D movie. For this you need to install mencoder and ffmpeg (only tested on OSX).
+    # v.visualise_data_pca_3d_movie(1, 2, 3, input_data=False)
 
 
 def example2():
@@ -100,7 +100,7 @@ def example2():
     ### DATA PREPARATION ###
 
     # Define training and test set paths.
-    datapath = os.path.join('input','20news-18828')
+    datapath = os.path.join('input', '20news-18828')
 
     # Generate list of all the subfolders in the data path
     paths = os.listdir(datapath)
@@ -127,7 +127,7 @@ def example2():
     # Generate network 2000-500-250-125-10 (real valued outputs), training 50 epochs.
     deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 250, 125], 10, 50, binary_output=False)
     # Pretrain with a replicated softmax model at the bottom and restricted boltzmann machines in the remaining layers.
-    deepbelief.run_pretraining()
+    deepbelief.run_pretraining(learning_rate=0.01, weight_cost=0.0002, momentum=0.9, gibbs_steps=1)
     # Construct deep autoencoder and finetune using backpropagation with conjugate gradient as optimization.
     deepbelief.run_finetuning(load_from_serialization=True)
 
@@ -150,8 +150,8 @@ def example2():
     v.visualise_data_pca_2d_two_components(1, 2, input_data=False)
     # Visualise the output data in 3d with 3 principal components.
     v.visualise_data_pca_3d(1, 2, 3, input_data=False)
-    # Visualise the output in a 3D movie with 3 principal components.
-    v.visualise_data_pca_3d_movie(1, 2, 3, input_data=False)
+    # Visualise the output in a 3D movie. For this you need to install mencoder and ffmpeg (only tested on OSX).
+    # v.visualise_data_pca_3d_movie(1, 2, 3, input_data=False)
 
 
 def example3():
@@ -191,9 +191,9 @@ def run_examples():
         (save all data to ./input/20_newsgroups)
     Example3: Runs out of the box on the output data given in ./output folder.
     '''
-    #example1()
-    #example2()
-    example3()
+    example1()
+    # example2()
+    # example3()
 
 
 if __name__ == '__main__':

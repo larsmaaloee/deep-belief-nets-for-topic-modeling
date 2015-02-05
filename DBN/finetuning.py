@@ -14,7 +14,8 @@ import env_paths
 
 
 class FineTuning:
-    def __init__(self, weight_matrices, batches, fout, hidden_biases=None, visible_biases=None, binary_output=False):
+    def __init__(self, weight_matrices, batches, fout, hidden_biases=None, visible_biases=None, binary_output=False,
+                 line_searches=3):
         """
         Initialize variables of the finetuning.
 
@@ -24,11 +25,13 @@ class FineTuning:
         @param hidden_biases: The hidden biases for the finetuning.
         @param visible_biases: The visible biases for the finetuning.
         @param binary_output: If the output of the DBN must be binary. If so, Gaussian noise will be added to bottleneck.
+        @param line_searches: Number of line searches for the conjugate gradient optimization.
         """
 
         # Progress and info monitoring
         self.fout = fout
         self.binary_output = binary_output
+        self.line_searches = line_searches
         # Generate sampled noise matrices
         self.sampled_noise = []
         self.current_sampled_noise = None
@@ -169,7 +172,8 @@ class FineTuning:
             collected_weights = array(collected_weights)
             weight_sizes.append(weight_sizes[0])
             weight_sizes = array(weight_sizes)
-            weights, _, _ = minimize(collected_weights, self.get_grad_and_error, (weight_sizes, x), maxnumlinesearch=3,
+            weights, _, _ = minimize(collected_weights, self.get_grad_and_error, (weight_sizes, x),
+                                     maxnumlinesearch=self.line_searches,
                                      verbose=True)
             weight_matrices_added_biases = self.__convert__(weights, weight_sizes)
             batch_count += 1
@@ -299,9 +303,9 @@ def error(args):
         err -= sum(x[:, :-1] * log(xout))
 
     if training:
-        out = 'Train error before epoch[%i]: %.2f'%(epoch+1, err/len(batches))
+        out = 'Train error before epoch[%i]: %.2f' % (epoch + 1, err / len(batches))
     else:
-        out = 'Test error before epoch[%i]: %.2f'%(epoch+1, err/len(batches))
+        out = 'Test error before epoch[%i]: %.2f' % (epoch + 1, err / len(batches))
 
     queue.put([training, out, err / (len(batches))])
 

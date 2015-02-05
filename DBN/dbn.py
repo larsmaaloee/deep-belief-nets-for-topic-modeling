@@ -42,12 +42,16 @@ class DBN:
         self.output_txt = []
 
 
-    def run_pretraining(self):
+    def run_pretraining(self, learning_rate=0.01, weight_cost=0.0002, momentum=0.9, gibbs_steps=1):
         """
         Run the pretraining of the DBN. Each RBM will be trained from bottom to top of the DBN.
         """
         # Following code is the initialisation of a dummy process in order to allow numpy and multiprocessing to run
         # properly on OSX.
+        self.learning_rate = learning_rate
+        self.weight_cost = weight_cost
+        self.momentum = momentum
+        self.gibbs_steps = gibbs_steps
         pretraining_process = Process(target=self.run_pretraining_as_process, args=())
         pretraining_process.start()
         pretraining_process.join()
@@ -57,8 +61,9 @@ class DBN:
         self.print_output('Pre Training')
         timer = time()
         # Bottom layer
-        self.print_output('Visible units: %i Hidden units: %i'%(self.visible_units,self.hidden_layers[0]))
-        r = PreTraining(self.visible_units, self.hidden_layers[0], self.batches, rbm_index, self.print_output)
+        self.print_output('Visible units: %i Hidden units: %i' % (self.visible_units, self.hidden_layers[0]))
+        r = PreTraining(self.visible_units, self.hidden_layers[0], self.batches, rbm_index, self.print_output,
+                        self.learning_rate, self.weight_cost, self.momentum, self.gibbs_steps)
         r.rsm_learn(self.max_epochs)
         self.weight_matrices.append(r.weights)
         self.hidden_biases.append(r.hidden_biases)
@@ -66,18 +71,18 @@ class DBN:
         rbm_index += 1
         # Middle layers
         for i in range(len(self.hidden_layers) - 1):
-            self.print_output('Bottom units: %i Top units: %i'%(self.hidden_layers[i],self.hidden_layers[i+1]))
+            self.print_output('Bottom units: %i Top units: %i' % (self.hidden_layers[i], self.hidden_layers[i + 1]))
             r = PreTraining(self.hidden_layers[i], self.hidden_layers[i + 1], self.batches, rbm_index,
-                            self.print_output)
+                            self.print_output, self.learning_rate, self.weight_cost, self.momentum, self.gibbs_steps)
             r.rbm_learn(self.max_epochs)
             self.weight_matrices.append(r.weights)
             self.hidden_biases.append(r.hidden_biases)
             self.visible_biases.append(r.visible_biases)
             rbm_index += 1
         # Top layer
-        self.print_output('Bottom units: %i Output units: %i'%(self.hidden_layers[-1],self.output_units))
+        self.print_output('Bottom units: %i Output units: %i' % (self.hidden_layers[-1], self.output_units))
         r = PreTraining(self.hidden_layers[len(self.hidden_layers) - 1], self.output_units, self.batches, rbm_index,
-                        self.print_output)
+                        self.print_output, self.learning_rate, self.weight_cost, self.momentum, self.gibbs_steps)
         r.rbm_learn(self.max_epochs, linear=True)
         self.weight_matrices.append(r.weights)
         self.hidden_biases.append(r.hidden_biases)
@@ -146,10 +151,10 @@ class DBN:
         """
         self.print_output("Finetuning train error:")
         for k in fine_tuning_error_train:
-            self.print_output('Train error epoch[%i]: %.2f'%(k+1,fine_tuning_error_train[k]))
+            self.print_output('Train error epoch[%i]: %.2f' % (k + 1, fine_tuning_error_train[k]))
         self.print_output("Finetuning test error:")
         for k in fine_tuning_error_test:
-            self.print_output('Test error epoch[%i]: %.2f'%(k+1,fine_tuning_error_test[k]))
+            self.print_output('Test error epoch[%i]: %.2f' % (k + 1, fine_tuning_error_test[k]))
 
     def save_output(self, finetuning=True):
         """

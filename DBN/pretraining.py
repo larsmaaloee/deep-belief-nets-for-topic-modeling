@@ -15,7 +15,8 @@ class PreTraining:
     training.
     """
 
-    def __init__(self, visible_units, hidden_units, batches, layer_index, fout):
+    def __init__(self, visible_units, hidden_units, batches, layer_index, fout, learning_rate, weight_cost, momentum,
+                 gibbs_steps):
         """
         Initialize the values for the RBM.
         
@@ -26,6 +27,10 @@ class PreTraining:
         @param batches: A list of batch sizes.
         @param layer_index: the index of the layer from bottom.
         @param fout: printing output function.
+        @param learning_rate: learning rate of the training.
+        @param weight_cost: weight cost of the training.
+        @param momentum: momentum of the training.
+        @param gibbs_steps: number of gibbs steps for contrastive divergence.
         """
 
         # Set the bag of words data.
@@ -42,9 +47,10 @@ class PreTraining:
         self.num_hid = hidden_units  # Set the number of hidden units
 
         # Following values should be modified to find the best value.
-        self.learning_rate = 0.01
-        self.weight_cost = 0.0002
-        self.momentum = 0.9
+        self.learning_rate = learning_rate
+        self.weight_cost = weight_cost
+        self.momentum = momentum
+        self.gibbs_steps = gibbs_steps
 
         self.words = 0
 
@@ -92,7 +98,7 @@ class PreTraining:
                 # Negative phase - generate data from hidden to visible units and then again to hidden units.
                 neg_vis = pos_vis
                 neg_hid_prob = pos_hid
-                for i in range(1):  # There is only 1 step of contrastive divergence
+                for i in range(self.gibbs_steps):  # There is only 1 step of contrastive divergence
                     neg_vis, neg_hid_prob, D, p = self.__contrastive_divergence_rsm__(neg_vis, pos_hid_prob, D)
                     if i == 0:
                         perplexity += p
@@ -170,7 +176,7 @@ class PreTraining:
                 # Negative phase - generate data from hidden to visible units and then again to hidden units.
                 neg_vis = pos_vis
                 neg_hid_prob = pos_hid
-                for i in range(1):  # There is only 1 step of contrastive divergence
+                for i in range(self.gibbs_steps):  # There is only 1 step of contrastive divergence
                     neg_vis, neg_hid_prob = self.__contrastive_divergence_rbm__(neg_vis, pos_hid_prob, linear)
 
                 # Set the error
