@@ -48,11 +48,11 @@ class DBN:
         """
         # Following code is the initialisation of a dummy process in order to allow numpy and multiprocessing to run
         # properly on OSX.
-        pretraining_process = Process(target=self.__run_pretraining_as_process, args=())
+        pretraining_process = Process(target=self.run_pretraining_as_process, args=())
         pretraining_process.start()
         pretraining_process.join()
 
-    def __run_pretraining_as_process(self):
+    def run_pretraining_as_process(self):
         rbm_index = 0
         self.print_output('Pre Training')
         timer = time()
