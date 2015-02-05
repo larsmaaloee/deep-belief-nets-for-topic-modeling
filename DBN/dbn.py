@@ -57,7 +57,7 @@ class DBN:
         self.print_output('Pre Training')
         timer = time()
         # Bottom layer
-        self.print_output('Visible units: ' + str(self.visible_units) + ' Hidden units: ' + str(self.hidden_layers[0]))
+        self.print_output('Visible units: %i Hidden units: %i'%(self.visible_units,self.hidden_layers[0]))
         r = PreTraining(self.visible_units, self.hidden_layers[0], self.batches, rbm_index, self.print_output)
         r.rsm_learn(self.max_epochs)
         self.weight_matrices.append(r.weights)
@@ -66,8 +66,7 @@ class DBN:
         rbm_index += 1
         # Middle layers
         for i in range(len(self.hidden_layers) - 1):
-            self.print_output(
-                'Top units: ' + str(self.hidden_layers[i]) + ' Bottom units: ' + str(self.hidden_layers[i + 1]))
+            self.print_output('Bottom units: %i Top units: %i'%(self.hidden_layers[i],self.hidden_layers[i+1]))
             r = PreTraining(self.hidden_layers[i], self.hidden_layers[i + 1], self.batches, rbm_index,
                             self.print_output)
             r.rbm_learn(self.max_epochs)
@@ -76,9 +75,7 @@ class DBN:
             self.visible_biases.append(r.visible_biases)
             rbm_index += 1
         # Top layer
-        self.print_output(
-            'Top units: ' + str(self.hidden_layers[len(self.hidden_layers) - 1]) + ' Output units: ' + str(
-                self.output_units))
+        self.print_output('Bottom units: %i Output units: %i'%(self.hidden_layers[-1],self.output_units))
         r = PreTraining(self.hidden_layers[len(self.hidden_layers) - 1], self.output_units, self.batches, rbm_index,
                         self.print_output)
         r.rbm_learn(self.max_epochs, linear=True)
@@ -149,10 +146,10 @@ class DBN:
         """
         self.print_output("Finetuning train error:")
         for k in fine_tuning_error_train:
-            self.print_output("Train error epoch[" + str(k + 1) + "]: " + str(fine_tuning_error_train[k]))
+            self.print_output('Train error epoch[%i]: %.2f'%(k+1,fine_tuning_error_train[k]))
         self.print_output("Finetuning test error:")
         for k in fine_tuning_error_test:
-            self.print_output("Test error epoch[" + str(k + 1) + "]: " + str(fine_tuning_error_test[k]))
+            self.print_output('Test error epoch[%i]: %.2f'%(k+1,fine_tuning_error_test[k]))
 
     def save_output(self, finetuning=True):
         """

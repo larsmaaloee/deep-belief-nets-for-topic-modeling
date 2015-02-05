@@ -299,9 +299,9 @@ def error(args):
         err -= sum(x[:, :-1] * log(xout))
 
     if training:
-        out = 'Train error before epoch[' + str(epoch + 1) + ']: ' + str(err / (len(batches)))
+        out = 'Train error before epoch[%i]: %.2f'%(epoch+1, err/len(batches))
     else:
-        out = 'Test error before epoch[' + str(epoch + 1) + ']: ' + str(err / (len(batches)))
+        out = 'Test error before epoch[%i]: %.2f'%(epoch+1, err/len(batches))
 
     queue.put([training, out, err / (len(batches))])
 

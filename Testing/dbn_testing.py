@@ -59,7 +59,7 @@ class DBNTesting:
         """
         accuracies = []
         for e in evaluation_points:
-            self.__output('Evaluation: ' + str(e))
+            self.__output('Evaluation: %i'%(e))
             acc = 0.0
             for it in range(len(self.output_data)):
                 o1 = self.output_data[it]
@@ -85,10 +85,10 @@ class DBNTesting:
                 acc_temp /= len(indices)
                 acc += acc_temp
                 if it + 1 % 1000 == 0:
-                    self.__output('Correct: ' + str((acc / (it + 1)) * 100)[:4] + "%" + ' of ' + str(it + 1))
+                    self.__output('Correct: %.1f%% of %i'%((acc / (it + 1)) * 100,it+1))
             accuracies.append(acc / len(self.output_data))
         for i in range(len(accuracies)):
-            self.__output("Eval[" + str(evaluation_points[i]) + "]: " + str(accuracies[i] * 100) + "%")
+            self.__output('Eval[%i]: %.2f%%'%(evaluation_points[i],accuracies[i]*100))
         self.__write_output_to_file()
 
     def __write_output_to_file(self):
@@ -143,7 +143,7 @@ class DBNTesting:
 
         accuracies = []
         for e in evaluation_points:
-            self.__output('Evaluation: ' + str(e))
+            self.__output('Evaluate %i nearest neighbors.'%(e))
             acc = 0.0
             processed = 0
             for i in xrange(len(self.split_output_data)):
@@ -161,11 +161,11 @@ class DBNTesting:
                     acc += result_queue.get()
                 processed += len(o)
                 if processed % 1000 == 0:
-                    self.__output('Correct: ' + str((acc / (processed)) * 100)[:4] + "%" + ' of ' + str(processed))
+                    self.__output('Correct: %.1f%% of %i'%((acc/processed)*100,processed))
             accuracies.append(acc / len(self.output_data))
 
         for i in range(len(accuracies)):
-            self.__output("Eval[" + str(evaluation_points[i]) + "]: " + str(accuracies[i] * 100) + "%")
+            self.__output('Eval[%i]: %.2f%%'%(evaluation_points[i],accuracies[i]*100))
 
         self.__write_output_to_file()
 
