@@ -2,7 +2,9 @@ Deep Belief Nets for Topic Modeling
 ===================================
 Python toolbox using deep belief nets (DBN) for running topic modeling on document data. The concept of the method is to load bag-of-words (BOW) and produce a strong latent representation that will then be used for a content based recommender system.
 
-The toolbox is written for a [M.Sc. thesis project](http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6742). For a shorter read you are urged to read our article [Deep Belief Nets for Topic Modeling](http://xxx.tau.ac.il/abs/1501.04325) accepted at the ICML2014 workshop Knowledge-Powered Deep Learning for Text Mining (KPDLTM).
+The toolbox is written for a [M.Sc. thesis project](http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6742). For a shorter read we urge you to read the article [Deep Belief Nets for Topic Modeling](http://xxx.tau.ac.il/abs/1501.04325) accepted at the ICML2014 workshop Knowledge-Powered Deep Learning for Text Mining (KPDLTM).
+
+The toolbox is tested to run on Windows 7, Ubuntu 14.04.1 and OSX 10.8-10. You need following prerequisite packages: nltk, numpy, scipy, scikit-learn and matplotlib installed on your system before running the toolbox. If you are interested in producing 3D plots of the output space you will need to install MENCODER and FFMPEG (only tested on OSX).
 
 ![PCA on the output of 6 categories from the 20 newsgroups dataset run on a 2000-500-250-125-10 (real output) DBN.](/output/_output_20news.jpg?raw=true "20 newsgroups output")
 
