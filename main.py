@@ -58,7 +58,7 @@ def example1():
     ### DBN TRAINING ###
 
     # Generate network 2000-500-500-128 (binary outputs), training 50 epochs.
-    deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 500], 128, 1, binary_output=True)
+    deepbelief = dbn.DBN(2000, data_processing.get_batch_list(), [500, 500], 128, 50, binary_output=True)
     # Pretrain with a replicated softmax model at the bottom and restricted boltzmann machines in the remaining layers.
     deepbelief.run_pretraining(learning_rate=0.01, weight_cost=0.0002, momentum=0.9, gibbs_steps=1)
     # Construct deep autoencoder and finetune using backpropagation with conjugate gradient as optimization.
